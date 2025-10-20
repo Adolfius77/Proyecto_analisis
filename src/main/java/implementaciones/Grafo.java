@@ -12,16 +12,17 @@ public class Grafo {
     private final Map<String, Integer> indices; // Mapea el nombre del vertice a su indice en la matriz
     private final List<String> vertices;       // Mapea el indice al nombre del vertice
     private int numeroVertices;
+    private int capacidad = 10;
     private final boolean esDirigido;
     private final boolean esPonderado;
-    private static final int CAPACIDAD_MAXIMA = 100; // Capacidad maxima de vertices
+
 
     public Grafo(boolean esDirigido, boolean esPonderado) {
         this.esDirigido = esDirigido;
         this.esPonderado = esPonderado;
         this.indices = new HashMap<>();
         this.vertices = new ArrayList<>();
-        this.matrizAdyacencia = new int[CAPACIDAD_MAXIMA][CAPACIDAD_MAXIMA];
+        this.matrizAdyacencia = new int[capacidad][capacidad];
         this.numeroVertices = 0;
     }
 
@@ -37,7 +38,7 @@ public class Grafo {
         if (indices.containsKey(vertice)) {
             return "Info: El vertice '" + vertice + "' ya existia.";
         }
-        if (numeroVertices >= CAPACIDAD_MAXIMA) {
+        if (numeroVertices >= capacidad) {
             return "Error: Se ha alcanzado la capacidad maxima de vertices.";
         }
         indices.put(vertice, numeroVertices);
@@ -54,7 +55,7 @@ public class Grafo {
 
         int n = numeroVertices;
         // Crear una nueva matriz mas pequena
-        int[][] nuevaMatriz = new int[CAPACIDAD_MAXIMA][CAPACIDAD_MAXIMA];
+        int[][] nuevaMatriz = new int[numeroVertices][numeroVertices];
 
         // Remover el vertice de las listas de mapeo
         vertices.remove(indice.intValue());

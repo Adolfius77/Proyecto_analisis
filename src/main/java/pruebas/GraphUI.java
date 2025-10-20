@@ -1,6 +1,6 @@
 package pruebas;
 
-import implementaciones.Grafo; // Asegúrate que esta importación sea correcta
+import implementaciones.Grafo; // Asegurate que esta importacion sea correcta
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 
 public class GraphUI extends JFrame {
 
-    // Lógica del Grafo
+    // Logica del Grafo
     private Grafo grafo;
 
     // Componentes de la UI
@@ -31,7 +31,7 @@ public class GraphUI extends JFrame {
     private final Color COLOR_TEXTO_BOTON = Color.WHITE;
     private final Font FUENTE_BOTON = new Font("Segoe UI", Font.BOLD, 12);
 
-    // Enumeración para tipos de log
+    // Enumeracion para tipos de log
     private enum LogType { INFO, SUCCESS, ERROR }
 
     public GraphUI() {
@@ -46,7 +46,7 @@ public class GraphUI extends JFrame {
             e.printStackTrace();
         }
 
-        // --- Configuración de la ventana principal ---
+        // --- Configuracion de la ventana principal ---
         setTitle("GraphMaster Pro 📈 - Visualizador de Grafos");
         setSize(900, 750);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,7 +68,7 @@ public class GraphUI extends JFrame {
 
     private JPanel createConfigPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
-        panel.setBorder(BorderFactory.createTitledBorder("1. Configuración del Grafo"));
+        panel.setBorder(BorderFactory.createTitledBorder("1. Configuracion del Grafo"));
 
         rDirigido = new JRadioButton("Dirigido", true);
         JRadioButton rNoDirigido = new JRadioButton("No Dirigido");
@@ -100,15 +100,15 @@ public class GraphUI extends JFrame {
         panelOperaciones.setLayout(new BoxLayout(panelOperaciones, BoxLayout.Y_AXIS));
         panelOperaciones.setBorder(BorderFactory.createTitledBorder("2. Operaciones"));
 
-        // Panel de Vértices
+        // Panel de Vertices
         JPanel panelVertices = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelVertices.setBorder(BorderFactory.createTitledBorder("Vértices"));
+        panelVertices.setBorder(BorderFactory.createTitledBorder("Vertices"));
         txtVertice = new JTextField(8);
         btnInsertarVertice = createStyledButton("Insertar");
         btnEliminarVertice = createStyledButton("Eliminar");
         btnGrado = createStyledButton("Grado");
         btnAdyacentes = createStyledButton("Adyacentes");
-        panelVertices.add(new JLabel("Vértice:"));
+        panelVertices.add(new JLabel("Vertice:"));
         panelVertices.add(txtVertice);
         panelVertices.add(btnInsertarVertice);
         panelVertices.add(btnEliminarVertice);
@@ -134,10 +134,10 @@ public class GraphUI extends JFrame {
         panelAristas.add(btnEliminarArista);
         panelAristas.add(btnActualizarPeso);
 
-        // Panel de Información General
+        // Panel de Informacion General
         JPanel panelInfo = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelInfo.setBorder(BorderFactory.createTitledBorder("Información General del Grafo"));
-        btnInfoGeneral = createStyledButton("Contar Vértices/Aristas");
+        panelInfo.setBorder(BorderFactory.createTitledBorder("Informacion General del Grafo"));
+        btnInfoGeneral = createStyledButton("Contar Vertices/Aristas");
         btnMatriz = createStyledButton("Mostrar Matriz de Adyacencia");
         panelInfo.add(btnInfoGeneral);
         panelInfo.add(btnMatriz);
@@ -159,7 +159,7 @@ public class GraphUI extends JFrame {
         return scrollPane;
     }
 
-    // Método createStyledButton ahora solo toma el texto (sin iconName)
+    // Metodo createStyledButton ahora solo toma el texto (sin iconName)
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         styleButton(button);
@@ -200,7 +200,7 @@ public class GraphUI extends JFrame {
     private void crearGrafo(ActionEvent e) {
         grafo = new Grafo(rDirigido.isSelected(), rPonderado.isSelected());
 
-        // Deshabilita los componentes del panel de configuración usando la variable de instancia.
+        // Deshabilita los componentes del panel de configuracion usando la variable de instancia.
         for (Component c : panelConfiguracion.getComponents()) {
             c.setEnabled(false);
         }
@@ -211,7 +211,7 @@ public class GraphUI extends JFrame {
 
         areaSalida.setText("");
         log("Grafo creado. ¡Listo para operar!", LogType.SUCCESS);
-        JOptionPane.showMessageDialog(this, "El grafo ha sido creado con éxito.", "Creación Exitosa", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "El grafo ha sido creado con exito.", "Creacion Exitosa", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void handleAction(Runnable action) {
@@ -227,7 +227,7 @@ public class GraphUI extends JFrame {
         }
     }
 
-    // --- Métodos de Acción ---
+    // --- Metodos de Accion ---
 
     private void accionInsertarVertice() {
         String vertice = txtVertice.getText().trim();
@@ -235,7 +235,7 @@ public class GraphUI extends JFrame {
             log(grafo.insertarVertice(vertice), LogType.INFO);
             txtVertice.setText("");
         } else {
-            log("El campo 'Vértice' no puede estar vacío.", LogType.ERROR);
+            log("El campo 'Vertice' no puede estar vacio.", LogType.ERROR);
         }
     }
 
@@ -245,7 +245,7 @@ public class GraphUI extends JFrame {
             log(grafo.eliminarVertice(vertice), LogType.INFO);
             txtVertice.setText("");
         } else {
-            log("El campo 'Vértice' no puede estar vacío.", LogType.ERROR);
+            log("El campo 'Vertice' no puede estar vacio.", LogType.ERROR);
         }
     }
 
@@ -254,7 +254,7 @@ public class GraphUI extends JFrame {
         if (!vertice.isEmpty()) {
             log(grafo.obtenerGradoVertice(vertice), LogType.INFO);
         } else {
-            log("El campo 'Vértice' no puede estar vacío.", LogType.ERROR);
+            log("El campo 'Vertice' no puede estar vacio.", LogType.ERROR);
         }
     }
 
@@ -263,7 +263,7 @@ public class GraphUI extends JFrame {
         if (!vertice.isEmpty()) {
             log(grafo.obtenerAdyacencias(vertice), LogType.INFO);
         } else {
-            log("El campo 'Vértice' no puede estar vacío.", LogType.ERROR);
+            log("El campo 'Vertice' no puede estar vacio.", LogType.ERROR);
         }
     }
 
@@ -271,7 +271,7 @@ public class GraphUI extends JFrame {
         String origen = txtOrigen.getText().trim();
         String destino = txtDestino.getText().trim();
         if (origen.isEmpty() || destino.isEmpty()) {
-            log("Los campos 'Origen' y 'Destino' no pueden estar vacíos.", LogType.ERROR);
+            log("Los campos 'Origen' y 'Destino' no pueden estar vacios.", LogType.ERROR);
             return;
         }
 
@@ -280,7 +280,7 @@ public class GraphUI extends JFrame {
             try {
                 peso = Integer.parseInt(txtPeso.getText().trim());
             } catch (NumberFormatException e) {
-                log("El peso debe ser un número entero válido.", LogType.ERROR);
+                log("El peso debe ser un numero entero valido.", LogType.ERROR);
                 return;
             }
         }
@@ -298,7 +298,7 @@ public class GraphUI extends JFrame {
             txtOrigen.setText("");
             txtDestino.setText("");
         } else {
-            log("Los campos 'Origen' y 'Destino' no pueden estar vacíos.", LogType.ERROR);
+            log("Los campos 'Origen' y 'Destino' no pueden estar vacios.", LogType.ERROR);
         }
     }
 
@@ -317,14 +317,14 @@ public class GraphUI extends JFrame {
             txtDestino.setText("");
             txtPeso.setText("");
         } catch (NumberFormatException e) {
-            log("El nuevo peso debe ser un número entero.", LogType.ERROR);
+            log("El nuevo peso debe ser un numero entero.", LogType.ERROR);
         }
     }
 
-    // --- Lógica para Escribir en el JTextPane con Colores ---
+    // --- Logica para Escribir en el JTextPane con Colores ---
 
     private void log(String message, LogType type) {
-        if (message == null) return; // Evita errores si el método del grafo retorna null
+        if (message == null) return; // Evita errores si el metodo del grafo retorna null
 
         StyledDocument doc = areaSalida.getStyledDocument();
         SimpleAttributeSet style = new SimpleAttributeSet();
