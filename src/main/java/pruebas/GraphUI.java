@@ -1,24 +1,24 @@
 package pruebas;
 
-import implementaciones.Grafo; // Asegurate que esta importacion sea correcta
+import implementaciones.Grafo;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-// Ya no necesitamos java.net.URL ya que no cargamos iconos
+
 
 public class GraphUI extends JFrame {
 
-    // Logica del Grafo
+
     private Grafo grafo;
 
-    // Componentes de la UI
+
     private JRadioButton rDirigido, rPonderado;
     private JButton btnCrearGrafo;
     private JPanel panelConfiguracion, panelOperaciones;
-    private JTextPane areaSalida; // Usamos JTextPane para soportar colores
+    private JTextPane areaSalida;
 
     // Campos de texto y botones
     private JTextField txtVertice, txtOrigen, txtDestino, txtPeso;
@@ -32,14 +32,14 @@ public class GraphUI extends JFrame {
     private final Font FUENTE_BOTON = new Font("Segoe UI", Font.BOLD, 12);
 
     // Enumeracion para tipos de log
-    private enum LogType { INFO, SUCCESS, ERROR }
+    private enum LogType {INFO, SUCCESS, ERROR}
 
     public GraphUI() {
         initUI();
     }
 
     private void initUI() {
-        // --- Aplicar Look and Feel Moderno ---
+
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception e) {
@@ -55,7 +55,7 @@ public class GraphUI extends JFrame {
         ((JPanel) getContentPane()).setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // --- Paneles Principales ---
-        panelConfiguracion = createConfigPanel(); // Asignar a la variable de instancia
+        panelConfiguracion = createConfigPanel();
         add(panelConfiguracion, BorderLayout.NORTH);
         add(createOperationsPanel(), BorderLayout.CENTER);
         add(createOutputPanel(), BorderLayout.SOUTH);
@@ -352,7 +352,6 @@ public class GraphUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Ejecuta la UI en el hilo de despacho de eventos de Swing
         SwingUtilities.invokeLater(GraphUI::new);
     }
 }
