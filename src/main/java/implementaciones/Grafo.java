@@ -3,22 +3,26 @@ package implementaciones;
 import java.util.*;
 
 /**
- * Representa un grafo que puede ser dirigido o no dirigido, y ponderado o no ponderado.
- * La implementación utiliza una lista de adyacencia.
+ * Representa un grafo implementado con una matriz de adyacencia.
+ * Puede ser dirigido o no dirigido, y ponderado o no ponderado.
  */
 public class Grafo {
-    private final Map<String, List<Arista>> listaDeAdyacencia;
+
+    private int[][] matrizAdyacencia;
+    private final Map<String, Integer> indices; // Mapea el nombre del vertice a su indice en la matriz
+    private final List<String> vertices;       // Mapea el indice al nombre del vertice
+    private int numeroVertices;
     private final boolean esDirigido;
     private final boolean esPonderado;
+    private static final int CAPACIDAD_MAXIMA = 100; // Capacidad maxima de vertices
 
     public Grafo(boolean esDirigido, boolean esPonderado) {
-        this.listaDeAdyacencia = new HashMap<>();
         this.esDirigido = esDirigido;
         this.esPonderado = esPonderado;
-    }
-
-    public Map<String, List<Arista>> getListaDeAdyacencia() {
-        return listaDeAdyacencia;
+        this.indices = new HashMap<>();
+        this.vertices = new ArrayList<>();
+        this.matrizAdyacencia = new int[CAPACIDAD_MAXIMA][CAPACIDAD_MAXIMA];
+        this.numeroVertices = 0;
     }
 
     public boolean esDirigido() {
@@ -30,156 +34,189 @@ public class Grafo {
     }
 
     public String insertarVertice(String vertice) {
-        if (listaDeAdyacencia.putIfAbsent(vertice, new ArrayList<>()) == null) {
-            return "Vértice '" + vertice + "' insertado con éxito.";
-        } else {
-            return "Info: El vértice '" + vertice + "' ya existía.";
+        if (indices.containsKey(vertice)) {
+            return "Info: El vertice '" + vertice + "' ya existia.";
         }
+        if (numeroVertices >= CAPACIDAD_MAXIMA) {
+            return "Error: Se ha alcanzado la capacidad maxima de vertices.";
+        }
+        indices.put(vertice, numeroVertices);
+        vertices.add(vertice);
+        numeroVertices++;
+        return "Vertice '" + vertice + "' insertado con exito.";
     }
 
     public String eliminarVertice(String vertice) {
-        if (listaDeAdyacencia.remove(vertice) != null) {
-            for (List<Arista> aristas : listaDeAdyacencia.values()) {
-                aristas.removeIf(arista -> arista.destino.equals(vertice));
-            }
-            return "Vértice '" + vertice + "' eliminado.";
-        } else {
-            return "Error: Vértice '" + vertice + "' no existe.";
+        Integer indice = indices.get(vertice);
+        if (indice == null) {
+            return "Error: Vertice '" + vertice + "' no existe.";
         }
+
+        int n = numeroVertices;
+        // Crear una nueva matriz mas pequena
+        int[][] nuevaMatriz = new int[CAPACIDAD_MAXIMA][CAPACIDAD_MAXIMA];
+
+        // Remover el vertice de las listas de mapeo
+        vertices.remove(indice.intValue());
+        indices.remove(vertice);
+
+        // Actualizar los indices de los vertices restantes
+        for(int i = indice; i < vertices.size(); i++) {
+            indices.put(vertices.get(i), i);
+        }
+
+        // Copiar los valores a la nueva matriz, omitiendo la fila y columna del vertice eliminado
+        for (int i = 0, oldI = 0; i < n - 1; i++, oldI++) {
+            if (oldI == indice) oldI++; // Salta la fila del vertice eliminado
+            for (int j = 0, oldJ = 0; j < n - 1; j++, oldJ++) {
+                if (oldJ == indice) oldJ++; // Salta la columna del vertice eliminado
+                nuevaMatriz[i][j] = matrizAdyacencia[oldI][oldJ];
+            }
+        }
+
+        matrizAdyacencia = nuevaMatriz;
+        numeroVertices--;
+
+        return "Vertice '" + vertice + "' eliminado.";
     }
 
+
     public String insertarArista(String origen, String destino, int peso) {
-        if (!listaDeAdyacencia.containsKey(origen) || !listaDeAdyacencia.containsKey(destino)) {
-            return String.format("Error: Vértice origen '%s' o destino '%s' no existe.", origen, destino);
+        Integer indiceOrigen = indices.get(origen);
+        Integer indiceDestino = indices.get(destino);
+
+        if (indiceOrigen == null || indiceDestino == null) {
+            return String.format("Error: Vertice origen '%s' o destino '%s' no existe.", origen, destino);
         }
+
         int pesoReal = esPonderado ? peso : 1;
-        listaDeAdyacencia.get(origen).add(new Arista(destino, pesoReal));
+        matrizAdyacencia[indiceOrigen][indiceDestino] = pesoReal;
+
         String resultado = "Arista de '" + origen + "' a '" + destino + "' con peso " + pesoReal + " insertada.";
 
         if (!esDirigido) {
-            listaDeAdyacencia.get(destino).add(new Arista(origen, pesoReal));
+            matrizAdyacencia[indiceDestino][indiceOrigen] = pesoReal;
             resultado += "\n   (Grafo no dirigido) Arista de '" + destino + "' a '" + origen + "' insertada.";
         }
         return resultado;
     }
 
     public String eliminarArista(String origen, String destino) {
-        boolean removido = false;
-        if (listaDeAdyacencia.containsKey(origen)) {
-            removido = listaDeAdyacencia.get(origen).removeIf(arista -> arista.destino.equals(destino));
+        Integer indiceOrigen = indices.get(origen);
+        Integer indiceDestino = indices.get(destino);
+
+        if (indiceOrigen == null || indiceDestino == null) {
+            return "Error: No se encontro la arista porque uno de los vertices no existe.";
         }
 
-        if (!esDirigido && listaDeAdyacencia.containsKey(destino)) {
-            listaDeAdyacencia.get(destino).removeIf(arista -> arista.destino.equals(origen));
+        boolean removido = matrizAdyacencia[indiceOrigen][indiceDestino] != 0;
+        if (removido) {
+            matrizAdyacencia[indiceOrigen][indiceDestino] = 0;
+            if (!esDirigido) {
+                matrizAdyacencia[indiceDestino][indiceOrigen] = 0;
+            }
         }
 
-        return removido ? "Arista entre '" + origen + "' y '" + destino + "' eliminada." : "Error: No se encontró la arista.";
+        return removido ? "Arista entre '" + origen + "' y '" + destino + "' eliminada." : "Error: No se encontro la arista.";
     }
 
     public String actualizarPonderacion(String origen, String destino, int nuevoPeso) {
         if (!esPonderado) {
-            return "Operación no permitida: el grafo no es ponderado.";
+            return "Operacion no permitida: el grafo no es ponderado.";
         }
-        boolean actualizada = false;
-        if (listaDeAdyacencia.containsKey(origen)) {
-            for (Arista arista : listaDeAdyacencia.get(origen)) {
-                if (arista.destino.equals(destino)) {
-                    arista.peso = nuevoPeso;
-                    actualizada = true;
-                    break;
-                }
-            }
+        Integer indiceOrigen = indices.get(origen);
+        Integer indiceDestino = indices.get(destino);
+
+        if (indiceOrigen == null || indiceDestino == null || matrizAdyacencia[indiceOrigen][indiceDestino] == 0) {
+            return "Error: No se encontro la arista.";
         }
-        if (!esDirigido && listaDeAdyacencia.containsKey(destino)) {
-            for (Arista arista : listaDeAdyacencia.get(destino)) {
-                if (arista.destino.equals(origen)) {
-                    arista.peso = nuevoPeso;
-                }
-            }
+
+        matrizAdyacencia[indiceOrigen][indiceDestino] = nuevoPeso;
+        if (!esDirigido) {
+            matrizAdyacencia[indiceDestino][indiceOrigen] = nuevoPeso;
         }
-        return actualizada ? "Ponderación de '" + origen + "' a '" + destino + "' actualizada a " + nuevoPeso + "." : "Error: No se encontró la arista.";
+        return "Ponderacion de '" + origen + "' a '" + destino + "' actualizada a " + nuevoPeso + ".";
     }
 
     public String obtenerGradoVertice(String vertice) {
-        if (!listaDeAdyacencia.containsKey(vertice)) {
-            return "Error: El vértice '" + vertice + "' no existe.";
+        Integer indice = indices.get(vertice);
+        if (indice == null) {
+            return "Error: El vertice '" + vertice + "' no existe.";
         }
 
         if (esDirigido) {
-            int gradoSalida = listaDeAdyacencia.get(vertice).size();
-            int gradoEntrada = 0;
-            for (List<Arista> aristas : listaDeAdyacencia.values()) {
-                for (Arista arista : aristas) {
-                    if (arista.destino.equals(vertice)) {
-                        gradoEntrada++;
-                    }
-                }
+            int gradoSalida = 0;
+            for (int j = 0; j < numeroVertices; j++) {
+                if (matrizAdyacencia[indice][j] != 0) gradoSalida++;
             }
-            return "Vértice '" + vertice + "': Grado de Salida = " + gradoSalida + ", Grado de Entrada = " + gradoEntrada;
+            int gradoEntrada = 0;
+            for (int i = 0; i < numeroVertices; i++) {
+                if (matrizAdyacencia[i][indice] != 0) gradoEntrada++;
+            }
+            return "Vertice '" + vertice + "': Grado de Salida = " + gradoSalida + ", Grado de Entrada = " + gradoEntrada;
         } else {
-            int grado = listaDeAdyacencia.get(vertice).size();
-            return "Vértice '" + vertice + "': Grado = " + grado;
+            int grado = 0;
+            for (int j = 0; j < numeroVertices; j++) {
+                if (matrizAdyacencia[indice][j] != 0) grado++;
+            }
+            return "Vertice '" + vertice + "': Grado = " + grado;
         }
     }
 
     public String obtenerAdyacencias(String vertice) {
-        if (!listaDeAdyacencia.containsKey(vertice)) {
-            return "Error: Vértice '" + vertice + "' no existe.";
+        Integer indice = indices.get(vertice);
+        if (indice == null) {
+            return "Error: Vertice '" + vertice + "' no existe.";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("Vértices adyacentes a '" + vertice + "': ");
-        List<Arista> aristas = listaDeAdyacencia.get(vertice);
-        if (aristas.isEmpty()) {
+        sb.append("Vertices adyacentes a '" + vertice + "': ");
+        List<String> adyacentes = new ArrayList<>();
+        for (int j = 0; j < numeroVertices; j++) {
+            if (matrizAdyacencia[indice][j] != 0) {
+                String adyacente = vertices.get(j);
+                if (esPonderado) {
+                    adyacente += "(" + matrizAdyacencia[indice][j] + ")";
+                }
+                adyacentes.add(adyacente);
+            }
+        }
+
+        if (adyacentes.isEmpty()) {
             sb.append("Ninguno.");
         } else {
-            for (int i = 0; i < aristas.size(); i++) {
-                Arista arista = aristas.get(i);
-                sb.append(arista.destino).append(esPonderado ? "(" + arista.peso + ")" : "");
-                if (i < aristas.size() - 1) {
-                    sb.append(", ");
-                }
-            }
+            sb.append(String.join(", ", adyacentes));
         }
         return sb.toString();
     }
 
     public String obtenerNumeroVerticesYAristas() {
-        int numeroVertices = listaDeAdyacencia.size();
         int numeroAristas = 0;
-        for (List<Arista> aristas : listaDeAdyacencia.values()) {
-            numeroAristas += aristas.size();
+        for (int i = 0; i < numeroVertices; i++) {
+            for (int j = 0; j < numeroVertices; j++) {
+                if (matrizAdyacencia[i][j] != 0) {
+                    numeroAristas++;
+                }
+            }
         }
         if (!esDirigido) {
             numeroAristas /= 2;
         }
-        return "Total de vértices: " + numeroVertices + "\nTotal de aristas: " + numeroAristas;
+        return "Total de vertices: " + numeroVertices + "\nTotal de aristas: " + numeroAristas;
     }
 
     public String obtenerMatrizDeAdyacencia() {
-        List<String> vertices = new ArrayList<>(listaDeAdyacencia.keySet());
-        Collections.sort(vertices);
-        int n = vertices.size();
-        if (n == 0) return "El grafo está vacío.";
+        if (numeroVertices == 0) return "El grafo esta vacio.";
 
         StringBuilder sb = new StringBuilder("Matriz de Adyacencia:\n");
-        int[][] matriz = new int[n][n];
-        Map<String, Integer> indices = new HashMap<>();
-        for (int i = 0; i < n; i++) indices.put(vertices.get(i), i);
-
-        for (int i = 0; i < n; i++) {
-            for (Arista arista : listaDeAdyacencia.get(vertices.get(i))) {
-                matriz[i][indices.get(arista.destino)] = arista.peso;
-            }
-        }
 
         sb.append(String.format("%6s", ""));
-        for (String v : vertices) sb.append(String.format("| %-5s", v));
+        for (int i=0; i < numeroVertices; i++) sb.append(String.format("| %-5s", vertices.get(i)));
         sb.append("\n");
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < numeroVertices; i++) {
             sb.append(String.format("%-5s ", vertices.get(i)));
-            for (int j = 0; j < n; j++) {
-                sb.append(String.format("| %-5d", matriz[i][j]));
+            for (int j = 0; j < numeroVertices; j++) {
+                sb.append(String.format("| %-5d", matrizAdyacencia[i][j]));
             }
             sb.append("\n");
         }
